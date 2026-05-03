@@ -441,8 +441,8 @@ export default function App() {
     <div className={`min-h-screen transition-colors duration-1000 ${mode === 'tv' ? 'bg-white overflow-hidden text-black' : 'bg-[#E6E6E6] font-sans'}`}>
       
       {/* Dynamic Navigation */}
-      <nav className={`fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center p-1.5 rounded-full border transition-all duration-700 ${mode === 'tv' ? 'bg-black/5 border-black/10 opacity-0 hover:opacity-100 backdrop-blur-xl shadow-lg' : 'bg-black/90 border-black/10 shadow-2xl'}`}>
-        <div className="flex items-center gap-1">
+      <nav className={`fixed bottom-6 md:top-8 md:bottom-auto left-1/2 -translate-x-1/2 z-50 flex items-center overflow-x-auto w-[95vw] md:w-auto p-2 md:p-1.5 rounded-3xl md:rounded-full border transition-all duration-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${mode === 'tv' ? 'bg-black/5 border-black/10 opacity-0 hover:opacity-100 backdrop-blur-xl shadow-lg' : 'bg-black/95 md:bg-black/90 border-black/10 shadow-2xl'}`}>
+        <div className="flex items-center gap-1 shrink-0">
           {stations.map(s => (
             <button 
               key={s}
@@ -450,37 +450,39 @@ export default function App() {
                 setMode('control');
                 setSelectedStation(s);
               }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${mode === 'control' && selectedStation === s ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
+              className={`flex items-center whitespace-nowrap gap-2 px-4 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${mode === 'control' && selectedStation === s ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
             >
               {s.replace('Farmácia ', '')}
             </button>
           ))}
         </div>
         
-        <div className="w-[1px] h-4 bg-white/10 mx-2" />
+        <div className="w-[1px] h-4 bg-white/10 mx-2 shrink-0" />
 
-        <button 
-          onClick={() => setMode('history')}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${mode === 'history' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
-        >
-          <History size={14} />
-          Histórico
-        </button>
-        <button 
-          onClick={() => setMode('tv')}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${mode === 'tv' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
-        >
-          <Tv size={14} />
-          Modo TV
-        </button>
-        <div className="w-[1px] h-4 bg-white/10 mx-2" />
-        <button 
-          onClick={() => signOut(auth)}
-          className="w-10 h-10 flex items-center justify-center rounded-full text-white/30 hover:text-red-500 hover:bg-red-500/10 transition-all"
-          title="Sair"
-        >
-          <LogOut size={16} />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <button 
+            onClick={() => setMode('history')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'history' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
+          >
+            <History size={14} />
+            <span className="hidden sm:inline">Histórico</span>
+          </button>
+          <button 
+            onClick={() => setMode('tv')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'tv' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
+          >
+            <Tv size={14} />
+            <span className="hidden sm:inline">Modo TV</span>
+          </button>
+          <div className="w-[1px] h-4 bg-white/10 mx-2 shrink-0" />
+          <button 
+            onClick={() => signOut(auth)}
+            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full text-white/30 hover:text-red-500 hover:bg-red-500/10 transition-all"
+            title="Sair"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
       </nav>
 
       <AnimatePresence mode="wait">
@@ -490,9 +492,9 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.02 }}
-            className="max-w-2xl mx-auto pt-32 pb-20 px-6"
+            className="max-w-2xl mx-auto pt-10 md:pt-32 pb-32 md:pb-20 px-4 md:px-6 w-full"
           >
-            <div className="bg-[#7A1E6C] rounded-[40px] p-8 md:p-12 shadow-2xl border border-white/5 overflow-hidden relative">
+            <div className="bg-[#7A1E6C] rounded-[2rem] md:rounded-[40px] p-6 md:p-12 shadow-2xl border border-white/5 overflow-hidden relative">
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
               
               <header className="mb-10 relative z-10">
@@ -500,7 +502,7 @@ export default function App() {
                   <div className="w-2 h-2 rounded-full bg-[#7AC143] animate-pulse shadow-[0_0_8px_rgba(122,193,67,0.6)]" />
                   <span className="text-[10px] uppercase tracking-[0.4em] font-bold text-white/30">Sistema Online / Pronto @ {selectedStation}</span>
                 </div>
-                <h2 className="text-5xl font-black text-white tracking-tighter mb-4 italic uppercase">{selectedStation.replace('Farmácia ', '')}</h2>
+                <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4 italic uppercase break-words">{selectedStation.replace('Farmácia ', '')}</h2>
               </header>
 
               <form onSubmit={handleSendMessage} className="relative mb-12 z-10">
@@ -512,8 +514,8 @@ export default function App() {
                     className="w-full min-h-[140px] bg-transparent text-white text-2xl font-bold p-0 resize-none focus:outline-none placeholder:text-white/5 tracking-tight uppercase"
                     maxLength={200}
                   />
-                  <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/5">
-                    <div className="flex items-center gap-6">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-0 mt-6 pt-6 border-t border-white/5">
+                    <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-start">
                       <div className="flex flex-col">
                         <span className="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-1">UNIDADES</span>
                         <input
@@ -539,7 +541,7 @@ export default function App() {
                     <button 
                       disabled={!inputText.trim() || isSending}
                       type="submit"
-                      className="bg-white text-black px-8 py-4 rounded-2xl disabled:opacity-10 disabled:cursor-not-allowed hover:bg-neutral-200 transition-all font-black flex items-center gap-3 group shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95"
+                      className="w-full md:w-auto justify-center bg-white text-black px-8 py-4 rounded-2xl disabled:opacity-10 disabled:cursor-not-allowed hover:bg-neutral-200 transition-all font-black flex items-center gap-3 group shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95"
                     >
                       {isSending ? 'TRANSMITINDO...' : 'TRANSMITIR'}
                       <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -568,30 +570,30 @@ export default function App() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-white/5 p-6 rounded-3xl border border-white/5 flex items-center justify-between group hover:bg-white/[0.08] transition-all"
+                        className="bg-white/5 p-6 rounded-3xl border border-white/5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6 md:gap-4 group hover:bg-white/[0.08] transition-all"
                       >
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest group-hover:text-white transition-colors">{msg.senderName}</span>
-                            <div className="w-1 h-1 rounded-full bg-white/20" />
-                            <span className="text-[10px] font-bold text-[#7AC143] uppercase tracking-widest">{msg.station}</span>
-                            <div className="w-1 h-1 rounded-full bg-white/20" />
-                            <span className="text-[10px] font-mono text-white/20">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
+                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest group-hover:text-white transition-colors truncate">{msg.senderName}</span>
+                            <div className="w-1 h-1 rounded-full bg-white/20 shrink-0" />
+                            <span className="text-[10px] font-bold text-[#7AC143] uppercase tracking-widest shrink-0">{msg.station}</span>
+                            <div className="w-1 h-1 rounded-full bg-white/20 shrink-0" />
+                            <span className="text-[10px] font-mono text-white/20 shrink-0">
                               {msg.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4 mt-1">
+                          <div className="flex flex-wrap items-center gap-4 mt-1">
                             {msg.itemCount && (
-                              <span className="bg-white/10 text-white px-3 py-1.5 rounded-xl text-xs font-black border border-white/20 whitespace-nowrap uppercase tracking-widest">
+                              <span className="bg-white/10 text-white px-3 py-1.5 rounded-xl text-xs font-black border border-white/20 whitespace-nowrap uppercase tracking-widest shrink-0">
                                 {msg.itemCount} UNIDADES
                               </span>
                             )}
-                            <p className="text-white text-xl font-bold tracking-tight uppercase leading-none">{msg.text}</p>
+                            <p className="text-white text-xl font-bold tracking-tight uppercase leading-snug break-words">{msg.text}</p>
                           </div>
                         </div>
                         <button 
                           onClick={() => deactivateMessage(msg.id)}
-                          className="flex flex-col items-center gap-2 px-6 py-4 bg-white/5 hover:bg-[#7AC143] text-white/40 hover:text-white rounded-2xl transition-all border border-white/10 hover:border-[#7AC143] group/btn ml-4 flex-shrink-0"
+                          className="flex flex-row md:flex-col items-center justify-center gap-2 px-6 py-4 bg-white/5 hover:bg-[#7AC143] text-white/40 hover:text-white rounded-2xl transition-all border border-white/10 hover:border-[#7AC143] group/btn md:ml-4 flex-shrink-0 w-full md:w-auto"
                           title="Acusar recebimento"
                         >
                           <Check size={28} className="group-hover/btn:scale-110 transition-transform" />
@@ -614,9 +616,9 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="max-w-4xl mx-auto pt-32 pb-20 px-6"
+            className="max-w-4xl mx-auto pt-10 md:pt-32 pb-32 md:pb-20 px-4 md:px-6 w-full"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
               <div className="bg-[#7A1E6C] rounded-3xl p-6 border border-white/5">
                 <div className="flex items-center gap-3 text-white/40 mb-4 font-bold text-[10px] uppercase tracking-widest">
                   <BarChart3 size={14} /> Total de Avisos
@@ -639,7 +641,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-[#7A1E6C] rounded-[40px] p-8 border border-white/5">
+            <div className="bg-[#7A1E6C] rounded-[2rem] md:rounded-[40px] p-5 md:p-8 border border-white/5 overflow-hidden">
               <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20 mb-8">Log Histórico de Transmissões</h3>
               
               <div className="space-y-4">
@@ -649,24 +651,24 @@ export default function App() {
                     : null;
 
                   return (
-                    <div key={msg.id} className="grid grid-cols-[1fr_auto] gap-4 p-5 bg-white/[0.03] rounded-2xl border border-white/[0.05] hover:bg-white/[0.05] transition-all group">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{msg.senderName}</span>
-                          <span className="text-[10px] font-bold text-[#6DBE45] uppercase tracking-widest">{msg.station}</span>
-                          <span className="text-white/10 font-mono text-[10px]"># {msg.id.substring(0, 8)}</span>
+                    <div key={msg.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 p-5 bg-white/[0.03] rounded-2xl border border-white/[0.05] hover:bg-white/[0.05] transition-all group">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-3 mb-2">
+                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest truncate">{msg.senderName}</span>
+                          <span className="text-[10px] font-bold text-[#6DBE45] uppercase tracking-widest shrink-0">{msg.station}</span>
+                          <span className="text-white/10 font-mono text-[10px] shrink-0"># {msg.id.substring(0, 8)}</span>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-start md:items-center gap-4 flex-col md:flex-row">
                           {msg.itemCount && (
-                            <span className="bg-white/10 text-white/70 px-2 py-0.5 rounded text-xs font-bold border border-white/10 whitespace-nowrap">
+                            <span className="bg-white/10 text-white/70 px-2 py-0.5 rounded text-xs font-bold border border-white/10 whitespace-nowrap shrink-0">
                               {msg.itemCount} UN
                             </span>
                           )}
-                          <p className="text-white font-bold uppercase tracking-tight">{msg.text}</p>
+                          <p className="text-white font-bold uppercase tracking-tight break-words">{msg.text}</p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end justify-center">
-                        <div className="text-[10px] font-black italic text-[#7AC143] uppercase tracking-widest mb-1">
+                      <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center pt-2 md:pt-0 border-t border-white/5 md:border-t-0 mt-2 md:mt-0">
+                        <div className="text-[10px] font-black italic text-[#7AC143] uppercase tracking-widest mb-1 md:mb-1">
                           {duration !== null ? `${duration}m RESOLVIDO` : 'CONCLUÍDO'}
                         </div>
                         <div className="text-[9px] font-mono text-white/20">
