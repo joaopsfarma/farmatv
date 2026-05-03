@@ -460,13 +460,15 @@ export default function App() {
         <div className="w-[1px] h-4 bg-white/10 mx-2 shrink-0" />
 
         <div className="flex items-center gap-1 shrink-0">
-          <button 
-            onClick={() => setMode('history')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'history' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
-          >
-            <History size={14} />
-            <span className="hidden sm:inline">Histórico</span>
-          </button>
+          {user?.email === 'joaopsfarma@gmail.com' && (
+            <button 
+              onClick={() => setMode('history')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'history' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
+            >
+              <History size={14} />
+              <span className="hidden sm:inline">Histórico</span>
+            </button>
+          )}
           <button 
             onClick={() => setMode('tv')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'tv' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
@@ -610,7 +612,7 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-black/30 font-bold italic">© 2026 FARMA.TV Sistema de Controle — Módulo de Alta Frequência</p>
             </footer>
           </motion.main>
-        ) : mode === 'history' ? (
+        ) : mode === 'history' && user?.email === 'joaopsfarma@gmail.com' ? (
           <motion.main 
             key="history"
             initial={{ opacity: 0, y: 20 }}

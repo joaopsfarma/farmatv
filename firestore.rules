@@ -31,7 +31,10 @@ service cloud.firestore {
     }
 
     match /messages/{messageId} {
-      allow list: if isSignedIn();
+      allow list: if isSignedIn() && (
+        (resource.data.active == true) || 
+        (request.auth.token.email == 'joaopsfarma@gmail.com' && request.auth.token.email_verified == true)
+      );
       allow get: if isSignedIn();
       
       // Anyone signed in can send a message
