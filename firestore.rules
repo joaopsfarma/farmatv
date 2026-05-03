@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Validation for Message
+    function isValidMessage(data) {
+      return data.keys().hasAll(['text', 'createdAt', 'active', 'station']) 
+        && data.keys().size() <= 13 // Adjusted for station and other fields
+        && data.text is string && data.text.size() <= 1000
+        && data.createdAt == request.time
+        && data.active is bool
+        && data.station in ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC'];
+    }
+
+    match /messages/{messageId} {
+      allow list: if isSignedIn();
+      allow get: if isSignedIn();
+      
+      // Anyone signed in can send a message
+      allow create: if isSignedIn() 
+        && isValidId(messageId)
+        && isValidMessage(incoming());
+
+      // Only the sender or an admin could delete, but let's allow signed in users to deactivate
+      allow update: if isSignedIn()
+        && (
+          (incoming().diff(resource.data).affectedKeys().hasOnly(['active', 'resolvedAt']) && incoming().resolvedAt == request.time)
+          || (incoming().diff(resource.data).affectedKeys().hasOnly(['active']))
+        );
+        
+      allow delete: if isSignedIn();
+    }
+  }
+}

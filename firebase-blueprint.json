@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "Message": {
+      "title": "Message",
+      "description": "Uma mensagem enviada pelo intercomunicador.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "O conteúdo da mensagem."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data e hora em que a mensagem foi enviada."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Se a mensagem deve ser exibida na TV."
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data e hora em que a mensagem foi resolvida/limpa."
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Nome de quem enviou (opcional)."
+        },
+        "station": {
+          "type": "string",
+          "enum": ["Farmácia UTI", "Farmácia PS", "Farmácia CC"],
+          "description": "Estação de destino da mensagem."
+        }
+      },
+      "required": ["text", "createdAt", "active", "station"]
+    }
+  },
+  "firestore": {
+    "messages": {
+      "schema": "Message",
+      "description": "Coleção de mensagens para exibição em tempo real."
+    }
+  }
+}
