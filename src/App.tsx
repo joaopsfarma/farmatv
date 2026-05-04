@@ -165,17 +165,24 @@ export default function App() {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map(doc => ({
+      let msgs = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Message[];
+
+      if (mode === 'tv-501') {
+        msgs = msgs.filter(m => m.destination === 'CAF');
+      } else if (mode === 'tv') {
+        msgs = msgs.filter(m => !m.destination || m.destination === 'CENTRAL');
+      }
+
       setMessages(msgs);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'messages');
     });
 
     return () => unsubscribe();
-  }, [user, mode]);
+  }, [user, mode, tvStation]);
 
   // Listen for history
   useEffect(() => {
