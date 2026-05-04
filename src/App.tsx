@@ -161,7 +161,7 @@ export default function App() {
     const q = query(
       collection(db, 'messages'),
       ...constraints,
-      limit(10) 
+      limit(50) 
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -858,7 +858,7 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <span className="text-[10px] font-black text-black/20 uppercase tracking-[0.4em]">Link de Nó: Estabilizado | TV: {tvStation === 'ALL' ? 'GLOBAL' : tvStation.toUpperCase()}</span>
+                <span className="text-[10px] font-black text-black/20 uppercase tracking-[0.4em]">Link de Nó: Estabilizado | {mode === 'tv-501' ? 'TV 501 (CAF)' : 'TV CENTRAL'} : {tvStation === 'ALL' ? 'GLOBAL' : tvStation.toUpperCase()}</span>
                 <span className="text-[8px] font-mono text-black/10">{user.uid.substring(0, 16)}@FARMA.TV-CH-01</span>
               </div>
               <div className="flex items-center gap-4">
