@@ -760,7 +760,7 @@ export default function App() {
                             damping: 15,
                             delay: 0.3
                           }}
-                          className="text-[12vw] font-black leading-[0.85] tracking-tighter uppercase italic select-none drop-shadow-md line-clamp-3"
+                          className="text-[8vw] md:text-[10vw] max-w-[95vw] mx-auto px-4 font-black leading-[0.9] tracking-tighter uppercase italic select-none drop-shadow-md break-words text-balance"
                         >
                           {currentTvMessage.text}
                         </motion.div>
