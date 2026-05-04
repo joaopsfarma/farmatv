@@ -118,7 +118,7 @@ export default function App() {
   }, [messages.length, tvMessageIndex]);
 
   // Random names list
-  const stations = ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC'];
+  const stations = ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC', 'Farmácia Central'];
   const randomNames = ['Visitante Silencioso', 'Chefe do Andar', 'Vizinho de Cima', 'Mensageiro Digital', 'Voz do Além', 'Capitão Intercom'];
 
   // Auth connection test and listener
