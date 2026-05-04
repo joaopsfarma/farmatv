@@ -40,6 +40,7 @@ interface Message {
   senderName?: string;
   station: string;
   itemCount?: number | null;
+  destination?: string;
 }
 
 const TvElapsedTime = ({ createdAt, onStatusChange }: { createdAt: any, onStatusChange: (status: 'normal' | 'warning' | 'critical') => void }) => {
@@ -83,11 +84,12 @@ const TvElapsedTime = ({ createdAt, onStatusChange }: { createdAt: any, onStatus
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<'control' | 'tv' | 'history'>('control');
+  const [mode, setMode] = useState<'control' | 'tv' | 'tv-501' | 'history'>('control');
   const [messages, setMessages] = useState<Message[]>([]);
   const [historyMessages, setHistoryMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [itemCount, setItemCount] = useState<number | ''>('');
+  const [destination, setDestination] = useState<'CENTRAL' | 'CAF'>('CENTRAL');
   const [isSending, setIsSending] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -101,7 +103,7 @@ export default function App() {
   const [tvMessageIndex, setTvMessageIndex] = useState(0);
 
   useEffect(() => {
-    if (mode === 'tv' && messages.length > 1) {
+    if ((mode === 'tv' || mode === 'tv-501') && messages.length > 1) {
       const interval = setInterval(() => {
         setTvMessageIndex((prev) => (prev + 1) % messages.length);
       }, 7000); // cycle every 7 seconds
@@ -152,7 +154,7 @@ export default function App() {
       orderBy('createdAt', 'desc')
     ];
 
-    if (mode === 'tv' && tvStation !== 'ALL') {
+    if ((mode === 'tv' || mode === 'tv-501') && tvStation !== 'ALL') {
       constraints.push(where('station', '==', tvStation));
     }
 
@@ -245,7 +247,8 @@ export default function App() {
         createdAt: serverTimestamp(),
         active: true,
         senderName: user.displayName || 'Anônimo',
-        station: selectedStation
+        station: selectedStation,
+        destination: destination
       });
       setInputText('');
       setItemCount('');
@@ -331,7 +334,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (mode === 'tv') {
+    if (mode === 'tv' || mode === 'tv-501') {
       if (tvStatus !== prevTvStatus) {
         if (tvStatus === 'warning') {
           playAlertSound('warning');
@@ -349,13 +352,13 @@ export default function App() {
   }, [tvStatus, prevTvStatus, mode, playAlertSound, messages.length]);
 
   useEffect(() => {
-    if (mode === 'tv' && messages.length > 0) {
+    if ((mode === 'tv' || mode === 'tv-501') && messages.length > 0) {
       const currentMessage = messages[0];
       if (currentMessage.id !== lastPlayedId) {
         playAlertSound('new');
         setLastPlayedId(currentMessage.id);
       }
-    } else if (mode === 'tv' && messages.length === 0) {
+    } else if ((mode === 'tv' || mode === 'tv-501') && messages.length === 0) {
       setTvStatus('normal');
     }
   }, [messages, mode, lastPlayedId, playAlertSound]);
@@ -438,10 +441,10 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-1000 ${mode === 'tv' ? 'bg-white overflow-hidden text-black' : 'bg-[#E6E6E6] font-sans'}`}>
+    <div className={`min-h-screen transition-colors duration-1000 ${mode === 'tv' || mode === 'tv-501' ? 'bg-white overflow-hidden text-black' : 'bg-[#E6E6E6] font-sans'}`}>
       
       {/* Dynamic Navigation */}
-      <nav className={`fixed bottom-6 md:top-8 md:bottom-auto left-1/2 -translate-x-1/2 z-50 flex items-center overflow-x-auto w-[95vw] md:w-auto p-2 md:p-1.5 rounded-3xl md:rounded-full border transition-all duration-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${mode === 'tv' ? 'bg-black/5 border-black/10 opacity-0 hover:opacity-100 backdrop-blur-xl shadow-lg' : 'bg-black/95 md:bg-black/90 border-black/10 shadow-2xl'}`}>
+      <nav className={`fixed bottom-6 md:top-8 md:bottom-auto left-1/2 -translate-x-1/2 z-50 flex items-center overflow-x-auto w-[95vw] md:w-auto p-2 md:p-1.5 rounded-3xl md:rounded-full border transition-all duration-700 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${mode === 'tv' || mode === 'tv-501' ? 'bg-black/5 border-black/10 opacity-0 hover:opacity-100 backdrop-blur-xl shadow-lg' : 'bg-black/95 md:bg-black/90 border-black/10 shadow-2xl'}`}>
         <div className="flex items-center gap-1 shrink-0">
           {stations.map(s => (
             <button 
@@ -475,6 +478,13 @@ export default function App() {
           >
             <Tv size={14} />
             <span className="hidden sm:inline">Modo TV</span>
+          </button>
+          <button 
+            onClick={() => setMode('tv-501')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'tv-501' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
+          >
+            <Tv size={14} />
+            <span className="hidden sm:inline">TV 501</span>
           </button>
           <div className="w-[1px] h-4 bg-white/10 mx-2 shrink-0" />
           <button 
@@ -512,7 +522,7 @@ export default function App() {
                   <textarea 
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    placeholder="AVISO PARA A FARMÁCIA CENTRAL..."
+                    placeholder={`AVISO PARA A ${destination === 'CENTRAL' ? 'FARMÁCIA CENTRAL' : 'CAF'}...`}
                     className="w-full min-h-[140px] bg-transparent text-white text-2xl font-bold p-0 resize-none focus:outline-none placeholder:text-white/5 tracking-tight uppercase"
                     maxLength={200}
                   />
@@ -530,14 +540,15 @@ export default function App() {
                         />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-1">CARACTERES</span>
-                        <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden mt-3">
-                          <motion.div 
-                            className="h-full bg-white"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(inputText.length / 200) * 100}%` }}
-                          />
-                        </div>
+                        <span className="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-1">DESTINO</span>
+                        <select
+                          value={destination}
+                          onChange={(e) => setDestination(e.target.value as 'CENTRAL' | 'CAF')}
+                          className="bg-black/20 border border-white/10 rounded-lg w-28 px-3 py-2 text-white font-bold text-center appearance-none focus:outline-none focus:border-white/30"
+                        >
+                          <option value="CENTRAL">CENTRAL</option>
+                          <option value="CAF">CAF</option>
+                        </select>
                       </div>
                     </div>
                     <button 
@@ -578,7 +589,7 @@ export default function App() {
                           <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
                             <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest group-hover:text-white transition-colors truncate">{msg.senderName}</span>
                             <div className="w-1 h-1 rounded-full bg-white/20 shrink-0" />
-                            <span className="text-[10px] font-bold text-[#7AC143] uppercase tracking-widest shrink-0">{msg.station}</span>
+                            <span className="text-[10px] font-bold text-[#7AC143] uppercase tracking-widest shrink-0">{msg.station} {'->'} {msg.destination || 'CENTRAL'}</span>
                             <div className="w-1 h-1 rounded-full bg-white/20 shrink-0" />
                             <span className="text-[10px] font-mono text-white/20 shrink-0">
                               {msg.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -657,7 +668,7 @@ export default function App() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-3 mb-2">
                           <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest truncate">{msg.senderName}</span>
-                          <span className="text-[10px] font-bold text-[#6DBE45] uppercase tracking-widest shrink-0">{msg.station}</span>
+                          <span className="text-[10px] font-bold text-[#6DBE45] uppercase tracking-widest shrink-0">{msg.station} {'->'} {msg.destination || 'CENTRAL'}</span>
                           <span className="text-white/10 font-mono text-[10px] shrink-0"># {msg.id.substring(0, 8)}</span>
                         </div>
                         <div className="flex items-start md:items-center gap-4 flex-col md:flex-row">
@@ -727,8 +738,8 @@ export default function App() {
                         className="flex justify-center items-center gap-6 mb-12"
                       >
                         <div className="h-[2px] w-20 bg-black/20" />
-                        <span className="text-[#7A1E6C] text-lg tracking-[0.8em] font-black uppercase opacity-80">
-                          AVISO RECEBIDO: {currentTvMessage.station}
+                        <span className="text-[#7A1E6C] text-lg tracking-[0.8em] font-black uppercase opacity-80 text-center">
+                          AVISO DE {currentTvMessage.station} PARA {currentTvMessage.destination || 'CENTRAL'}
                           {messages.length > 1 && ` (${tvMessageIndex + 1}/${messages.length})`}
                         </span>
                         <div className="h-[2px] w-20 bg-black/20" />
