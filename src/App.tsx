@@ -484,7 +484,7 @@ export default function App() {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${mode === 'tv' ? 'bg-white text-black shadow-lg scale-105' : 'text-neutral-500 hover:text-white'}`}
           >
             <Tv size={14} />
-            <span className="hidden sm:inline">Modo TV</span>
+            <span className="hidden sm:inline">TV Central</span>
           </button>
           <button 
             onClick={() => setMode('tv-501')}
