@@ -27,7 +27,8 @@ service cloud.firestore {
         && data.text is string && data.text.size() <= 1000
         && data.createdAt == request.time
         && data.active is bool
-        && data.station in ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC'];
+        && data.station in ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC', 'Farmácia Central']
+        && (!data.keys().hasAny(['destination']) || data.destination in ['CENTRAL', 'CAF']);
     }
 
     match /messages/{messageId} {

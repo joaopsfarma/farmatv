@@ -29,7 +29,12 @@
         },
         "station": {
           "type": "string",
-          "enum": ["Farmácia UTI", "Farmácia PS", "Farmácia CC"],
+          "enum": ["Farmácia UTI", "Farmácia PS", "Farmácia CC", "Farmácia Central"],
+          "description": "Estação de origem da mensagem."
+        },
+        "destination": {
+          "type": "string",
+          "enum": ["CENTRAL", "CAF"],
           "description": "Estação de destino da mensagem."
         }
       },
