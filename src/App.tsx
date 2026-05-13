@@ -250,10 +250,14 @@ export default function App() {
       console.error("Auth failed", error);
       if (error.code === 'auth/email-already-in-use') {
         alert("Este email já está em uso.");
+      } else if (error.code === 'auth/invalid-email') {
+        alert("Endereço de email inválido.");
       } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
         alert("Email ou senha incorretos.");
-      } else if (error.code === 'auth/admin-restricted-operation') {
-        alert("Atenção: O login por 'Email/Senha' precisa ser ativado no Firebase Console!");
+      } else if (error.code === 'auth/weak-password') {
+        alert("A senha é muito fraca. Escolha uma senha com pelo menos 6 caracteres.");
+      } else if (error.code === 'auth/admin-restricted-operation' || error.code === 'auth/operation-not-allowed') {
+        alert("Atenção: O login por 'Email/Senha' precisa ser ativado no Firebase Console!\n\n1. Vá em Authentication > Sign-in method\n2. Ative o provedor de Email/Senha\n3. Salve e tente novamente.");
       } else {
         alert("Erro de autenticação: " + error.message);
       }
@@ -663,7 +667,7 @@ export default function App() {
                             <p className="text-white text-xl font-bold tracking-tight uppercase leading-snug break-words">{msg.text}</p>
                           </div>
                         </div>
-                        {user?.uid === msg.senderId && (
+                        {((user?.uid && msg.senderId && user.uid === msg.senderId) || user?.email === 'joaopsfarma@gmail.com') && (
                           <button 
                             onClick={() => deactivateMessage(msg.id)}
                             className="flex flex-row md:flex-col items-center justify-center gap-2 px-6 py-4 bg-white/5 hover:bg-[#7AC143] text-white/40 hover:text-white rounded-2xl transition-all border border-white/10 hover:border-[#7AC143] group/btn md:ml-4 flex-shrink-0 w-full md:w-auto"

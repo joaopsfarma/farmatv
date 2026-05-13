@@ -44,9 +44,9 @@ service cloud.firestore {
         && isValidId(messageId)
         && isValidMessage(incoming());
 
-      // Only the sender can deactivate their own messages
+      // Only the sender and admin can deactivate messages
       allow update: if isSignedIn()
-        && resource.data.senderId == request.auth.uid
+        && (resource.data.senderId == request.auth.uid || (request.auth.token.email == 'joaopsfarma@gmail.com' && request.auth.token.email_verified == true))
         && (
           (incoming().diff(resource.data).affectedKeys().hasOnly(['active', 'resolvedAt']) && incoming().resolvedAt == request.time)
           || (incoming().diff(resource.data).affectedKeys().hasOnly(['active']))
