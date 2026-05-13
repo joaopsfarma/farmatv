@@ -22,13 +22,14 @@ service cloud.firestore {
 
     // Validation for Message
     function isValidMessage(data) {
-      return data.keys().hasAll(['text', 'createdAt', 'active', 'station']) 
-        && data.keys().size() <= 13 // Adjusted for station and other fields
+      return data.keys().hasAll(['text', 'createdAt', 'active', 'station', 'senderId']) 
+        && data.keys().size() <= 14 // Adjusted for station and other fields
         && data.text is string && data.text.size() <= 1000
         && data.createdAt == request.time
         && data.active is bool
         && data.station in ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC', 'Farmácia Central']
-        && (!data.keys().hasAny(['destination']) || data.destination in ['CENTRAL', 'CAF']);
+        && (!data.keys().hasAny(['destination']) || data.destination in ['CENTRAL', 'CAF'])
+        && data.senderId == request.auth.uid;
     }
 
     match /messages/{messageId} {
@@ -43,14 +44,15 @@ service cloud.firestore {
         && isValidId(messageId)
         && isValidMessage(incoming());
 
-      // Only the sender or an admin could delete, but let's allow signed in users to deactivate
+      // Only the sender can deactivate their own messages
       allow update: if isSignedIn()
+        && resource.data.senderId == request.auth.uid
         && (
           (incoming().diff(resource.data).affectedKeys().hasOnly(['active', 'resolvedAt']) && incoming().resolvedAt == request.time)
           || (incoming().diff(resource.data).affectedKeys().hasOnly(['active']))
         );
         
-      allow delete: if isSignedIn();
+      allow delete: if isSignedIn() && resource.data.senderId == request.auth.uid;
     }
   }
 }

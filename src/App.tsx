@@ -23,7 +23,8 @@ import {
   onAuthStateChanged,
   User,
   signOut,
-  signInAnonymously,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   updateProfile
 } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
@@ -38,6 +39,7 @@ interface Message {
   resolvedAt?: any;
   active: boolean;
   senderName?: string;
+  senderId?: string;
   station: string;
   itemCount?: number | null;
   destination?: string;
@@ -91,7 +93,10 @@ export default function App() {
   const [itemCount, setItemCount] = useState<number | ''>('');
   const [destination, setDestination] = useState<'CENTRAL' | 'CAF'>('CENTRAL');
   const [isSending, setIsSending] = useState(false);
-  const [guestName, setGuestName] = useState('');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authName, setAuthName] = useState('');
+  const [isSignup, setIsSignup] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [selectedStation, setSelectedStation] = useState('Farmácia UTI');
   const [tvStation, setTvStation] = useState<string | 'ALL'>(() => {
@@ -119,7 +124,6 @@ export default function App() {
 
   // Random names list
   const stations = ['Farmácia UTI', 'Farmácia PS', 'Farmácia CC', 'Farmácia Central'];
-  const randomNames = ['Visitante Silencioso', 'Chefe do Andar', 'Vizinho de Cima', 'Mensageiro Digital', 'Voz do Além', 'Capitão Intercom'];
 
   // Auth connection test and listener
   useEffect(() => {
@@ -220,22 +224,38 @@ export default function App() {
     }
   };
 
-  const handleGuestLogin = async (e: React.FormEvent) => {
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    const finalName = guestName.trim() || randomNames[Math.floor(Math.random() * randomNames.length)];
-    
+    if (!authEmail || !authPassword) {
+      alert('Por favor, preencha email e senha.');
+      return;
+    }
+    if (isSignup && !authName) {
+      alert('Por favor, informe seu nome para o cadastro.');
+      return;
+    }
+
     setIsLoggingIn(true);
     try {
-      const credentials = await signInAnonymously(auth);
-      await updateProfile(credentials.user, {
-        displayName: finalName
-      });
-    } catch (error: any) {
-      console.error("Guest login failed", error);
-      if (error.code === 'auth/admin-restricted-operation') {
-        alert("Atenção: O 'Login Anônimo' precisa ser ativado no Firebase Console!\n\n1. Vá em Authentication > Sign-in method\n2. Ative o provedor 'Anônimo'\n3. Salve e tente novamente.");
+      if (isSignup) {
+        const credentials = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+        await updateProfile(credentials.user, {
+          displayName: authName
+        });
+        // We force a page reload or state update here maybe, but Firebase auth listener handles it.
       } else {
-        alert("Erro ao entrar: " + error.message);
+        await signInWithEmailAndPassword(auth, authEmail, authPassword);
+      }
+    } catch (error: any) {
+      console.error("Auth failed", error);
+      if (error.code === 'auth/email-already-in-use') {
+        alert("Este email já está em uso.");
+      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+        alert("Email ou senha incorretos.");
+      } else if (error.code === 'auth/admin-restricted-operation') {
+        alert("Atenção: O login por 'Email/Senha' precisa ser ativado no Firebase Console!");
+      } else {
+        alert("Erro de autenticação: " + error.message);
       }
     } finally {
       setIsLoggingIn(false);
@@ -254,6 +274,7 @@ export default function App() {
         createdAt: serverTimestamp(),
         active: true,
         senderName: user.displayName || 'Anônimo',
+        senderId: user.uid,
         station: selectedStation,
         destination: destination
       });
@@ -401,26 +422,57 @@ export default function App() {
             <p className="text-white/40 text-sm">Painel de comunicação inteligente</p>
           </div>
 
-          <form onSubmit={handleGuestLogin} className="space-y-5 mb-10">
+          <form onSubmit={handleEmailAuth} className="space-y-5 mb-10">
+            {isSignup && (
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/30 ml-1">Seu Nome</label>
+                <input 
+                  type="text" 
+                  value={authName}
+                  onChange={(e) => setAuthName(e.target.value)}
+                  placeholder="Nome de exibição..."
+                  className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-white/20 transition-all font-medium text-white placeholder:text-white/10"
+                />
+              </div>
+            )}
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest font-bold text-white/30 ml-1">Identificação para a TV</label>
+              <label className="text-[10px] uppercase tracking-widest font-bold text-white/30 ml-1">Email</label>
               <input 
-                type="text" 
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                placeholder="Seu nome..."
+                type="email" 
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                placeholder="Seu email..."
+                className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-white/20 transition-all font-medium text-white placeholder:text-white/10"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest font-bold text-white/30 ml-1">Senha</label>
+              <input 
+                type="password" 
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                placeholder="******"
                 className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-4 focus:ring-white/5 focus:border-white/20 transition-all font-medium text-white placeholder:text-white/10"
               />
             </div>
             <button 
               type="submit"
               disabled={isLoggingIn}
-              className="w-full flex items-center justify-center gap-3 bg-white text-black py-4 px-6 rounded-2xl hover:bg-neutral-200 transition-all font-bold group"
+              className="w-full flex items-center justify-center gap-3 bg-white text-black py-4 px-6 rounded-2xl hover:bg-neutral-200 transition-all font-bold group mt-2"
             >
               <span className="group-active:scale-95 transition-transform">
-                {isLoggingIn ? 'CONECTANDO...' : 'ENTRAR COMO VISITANTE'}
+                {isLoggingIn ? 'PROCESSANDO...' : (isSignup ? 'CADASTRAR' : 'ENTRAR')}
               </span>
             </button>
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSignup(!isSignup)}
+                className="text-xs text-white/50 hover:text-white transition-colors"
+              >
+                {isSignup ? 'Já tem conta? Entrar' : 'Não tem conta? Cadastrar'}
+              </button>
+            </div>
           </form>
 
           <div className="relative mb-10">
@@ -428,7 +480,7 @@ export default function App() {
               <span className="w-full border-t border-white/5"></span>
             </div>
             <div className="relative flex justify-center text-[10px]">
-              <span className="bg-[#7A1E6C] px-3 text-white/20 font-bold uppercase tracking-widest">Acesso Administrativo</span>
+              <span className="bg-[#7A1E6C] px-3 text-white/20 font-bold uppercase tracking-widest">Acesso Rápido</span>
             </div>
           </div>
 
@@ -611,14 +663,16 @@ export default function App() {
                             <p className="text-white text-xl font-bold tracking-tight uppercase leading-snug break-words">{msg.text}</p>
                           </div>
                         </div>
-                        <button 
-                          onClick={() => deactivateMessage(msg.id)}
-                          className="flex flex-row md:flex-col items-center justify-center gap-2 px-6 py-4 bg-white/5 hover:bg-[#7AC143] text-white/40 hover:text-white rounded-2xl transition-all border border-white/10 hover:border-[#7AC143] group/btn md:ml-4 flex-shrink-0 w-full md:w-auto"
-                          title="Acusar recebimento"
-                        >
-                          <Check size={28} className="group-hover/btn:scale-110 transition-transform" />
-                          <span className="text-[10px] font-black uppercase tracking-widest leading-none">CIENTE</span>
-                        </button>
+                        {user?.uid === msg.senderId && (
+                          <button 
+                            onClick={() => deactivateMessage(msg.id)}
+                            className="flex flex-row md:flex-col items-center justify-center gap-2 px-6 py-4 bg-white/5 hover:bg-[#7AC143] text-white/40 hover:text-white rounded-2xl transition-all border border-white/10 hover:border-[#7AC143] group/btn md:ml-4 flex-shrink-0 w-full md:w-auto"
+                            title="Acusar recebimento"
+                          >
+                            <Check size={28} className="group-hover/btn:scale-110 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-widest leading-none">CIENTE</span>
+                          </button>
+                        )}
                       </motion.div>
                     ))}
                   </AnimatePresence>

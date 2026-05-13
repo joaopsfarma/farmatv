@@ -27,6 +27,10 @@
           "type": "string",
           "description": "Nome de quem enviou (opcional)."
         },
+        "senderId": {
+          "type": "string",
+          "description": "ID do usuário que enviou a mensagem."
+        },
         "station": {
           "type": "string",
           "enum": ["Farmácia UTI", "Farmácia PS", "Farmácia CC", "Farmácia Central"],
@@ -38,7 +42,7 @@
           "description": "Estação de destino da mensagem."
         }
       },
-      "required": ["text", "createdAt", "active", "station"]
+      "required": ["text", "createdAt", "active", "station", "senderId"]
     }
   },
   "firestore": {
